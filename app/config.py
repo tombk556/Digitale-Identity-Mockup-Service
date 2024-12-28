@@ -10,6 +10,7 @@ class Settings:
         self.algorithm = os.getenv("ALGORITHM")
         self.access_token_expire_minutes = int(
             os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES"))
+        self.private_key_directory = os.getenv("PRIVATE_KEY_DIRECTORY")
 
 
 class PsqlCred:

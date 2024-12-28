@@ -1,3 +1,5 @@
+from app.config import settings
+
 import os
 import datetime
 from cryptography.x509.oid import NameOID
@@ -40,7 +42,7 @@ def generate_user_certificate(id: str) -> tuple[bytes, bytes]:
 
 
 def create_file(id: str, name: str):
-    PRIVATE_KEY_DIRECTORY = "/Users/tom/Documents/AWI Msc./3. Semester/Digitale Wirtschaft & Verwaltung/Fallbeispiel 3/Mockup/app/tmp"
+    PRIVATE_KEY_DIRECTORY = settings.private_key_directory
     
     private_key, public_key = generate_user_certificate(id)
 
@@ -51,4 +53,4 @@ def create_file(id: str, name: str):
     
     download_url = private_key_path
     
-    return download_url, public_key.decode("utf-8")
+    return download_url, public_key

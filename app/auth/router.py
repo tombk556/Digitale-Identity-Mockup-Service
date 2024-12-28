@@ -1,9 +1,11 @@
 from app import models
 from app.db import PostgresDB
+from app.config import settings
 from app.auth import oauth2, schemas
 from app.auth.certificate import create_file
 
 import os
+import uuid
 from sqlalchemy.orm import Session
 from fastapi.responses import FileResponse
 from fastapi import APIRouter, Depends, status, HTTPException
@@ -13,7 +15,7 @@ auth = APIRouter(
     prefix="/auth",
     tags=["Authentication"])
 
-PRIVATE_KEY_DIRECTORY = "/tmp/private_keys"
+PRIVATE_KEY_DIRECTORY = settings.private_key_directory
 
 os.makedirs(PRIVATE_KEY_DIRECTORY, exist_ok=True)
 
@@ -28,12 +30,14 @@ def create_user(user: schemas.UserCreate, db: Session = Depends(PostgresDB.get_d
             detail="User already exist"
         )
     
-    user.password = oauth2.hash(user.password)
-    new_user = models.User(**user.model_dump())
+    id = uuid.uuid4()
+    download_url, public_key = create_file(str(id), user.username)
     
-
-    download_url, public_key = create_file(str(new_user.id),
-                                           new_user.name)
+    user.password = oauth2.hash(user.password)
+    new_user = models.User(id=id, email=user.email, username=user.username, 
+                           password=user.password, name=user.name, age=user.age, 
+                           public_key=public_key)
+    
     db.add(new_user)
     db.commit()
     db.refresh(new_user)
@@ -105,13 +109,11 @@ async def get_user(current_user: schemas.User = Depends(oauth2.get_current_user)
     return current_user
 
 
-@auth.get("/download_private_key/{file_name}")
-def download_private_key(file_name: str):
+@auth.get("/download_private_key")
+def download_private_key(current_user: schemas.User = Depends(oauth2.get_current_user)):
+    private_key_path = os.path.join(PRIVATE_KEY_DIRECTORY, f"{current_user.username}_private_key.pem")
     
-    PRIVATE_KEY_DIRECTORY = "/Users/tom/Documents/AWI Msc./3. Semester/Digitale Wirtschaft & Verwaltung/Fallbeispiel 3/Mockup/app/tmp"
-
-    private_key_path = os.path.join(PRIVATE_KEY_DIRECTORY, f"{file_name}_private_key.pem")
-    
+    print(private_key_path)
     if not os.path.exists(private_key_path):
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
