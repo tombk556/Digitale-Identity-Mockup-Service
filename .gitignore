@@ -1,0 +1,10 @@
+/.venv
+__pycache__/
+/uploaded_files
+*.py[cod]
+/notes.txt
+/.env
+/.DS_Store
+.VSCodeCounter/*
+/myenv
+/google-credentials.json
