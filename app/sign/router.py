@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, Form, File
 from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
 from app.auth import oauth2
@@ -19,35 +19,46 @@ sign = APIRouter(
     tags=["Authentication"]
 )
 
-PRIVATE_KEY_DIRECTORY = settings.private_key_directory
-
-
 @sign.post("/sign_message", response_model=schemas.SignResponse)
-def sign_message(sign_req: schemas.SignRequest, current_user: schemas.User = Depends(oauth2.get_current_user),
-):
-    private_key_path = os.path.join(PRIVATE_KEY_DIRECTORY, f"{current_user.username}_private_key.pem")
-    if not os.path.exists(private_key_path):
+async def sign_message_secure(message: str = Form(...), private_key_file: UploadFile = File(...), 
+                              current_user: schemas.User = Depends(oauth2.get_current_user)):
+    if not private_key_file.filename.endswith(".pem"):
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Private key file not found"
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid file format. Please upload a .pem file."
         )
 
-    with open(private_key_path, "rb") as key_file:
+    try:
+        file_contents = await private_key_file.read()
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Could not read the uploaded file."
+        )
+
+    try:
         private_key = serialization.load_pem_private_key(
-            key_file.read(),
+            file_contents,
             password=None
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Failed to load private key: {str(e)}"
         )
 
     signature = private_key.sign(
-        sign_req.message.encode("utf-8"),
+        message.encode("utf-8"),
         padding.PKCS1v15(),
         hashes.SHA256()
     )
 
     encoded_signature = base64.b64encode(signature).decode("utf-8")
 
-    return schemas.SignResponse(signature=encoded_signature, message=sign_req.message)
-
+    return schemas.SignResponse(
+        signature=encoded_signature,
+        message=message
+    )
 
 
 @sign.post("/verify_signature", response_model=schemas.VerifyResponse)
@@ -99,3 +110,5 @@ def verify_signature(verify_req: schemas.VerifyRequest, db: Session = Depends(Po
             is_valid=False,
             detail="Signature is invalid."
         )
+
+
