@@ -23,14 +23,8 @@ PRIVATE_KEY_DIRECTORY = settings.private_key_directory
 
 
 @sign.post("/sign_message", response_model=schemas.SignResponse)
-def sign_message(
-    sign_req: schemas.SignRequest,
-    current_user: schemas.User = Depends(oauth2.get_current_user),
+def sign_message(sign_req: schemas.SignRequest, current_user: schemas.User = Depends(oauth2.get_current_user),
 ):
-    """
-    Sign a message with the currently logged-in user's private key.
-    Returns the signature as a base64-encoded string.
-    """
     private_key_path = os.path.join(PRIVATE_KEY_DIRECTORY, f"{current_user.username}_private_key.pem")
     if not os.path.exists(private_key_path):
         raise HTTPException(
@@ -52,16 +46,13 @@ def sign_message(
 
     encoded_signature = base64.b64encode(signature).decode("utf-8")
 
-    return schemas.SignResponse(signature=encoded_signature)
+    return schemas.SignResponse(signature=encoded_signature, message=sign_req.message)
 
 
 
 @sign.post("/verify_signature", response_model=schemas.VerifyResponse)
-def verify_signature(
-    verify_req: schemas.VerifyRequest,
-    db: Session = Depends(PostgresDB.get_db)
-):
-    signer = db.query(models.User).filter(models.User.id == verify_req.signer_id).first()
+def verify_signature(verify_req: schemas.VerifyRequest, db: Session = Depends(PostgresDB.get_db)):
+    signer = db.query(models.User).filter(models.User.username == verify_req.username).first()
     if not signer:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,

@@ -6,11 +6,12 @@ class SignRequest(BaseModel):
 
 class SignResponse(BaseModel):
     signature: str
+    message: str
 
 class VerifyRequest(BaseModel):
     message: str
     signature: str
-    signer_id: str
+    username: str
 
 class VerifyResponse(BaseModel):
     is_valid: bool
