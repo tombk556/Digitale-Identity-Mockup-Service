@@ -2,6 +2,7 @@ from app import models
 from app.db import engine
 from app.config import settings
 from app.auth.router import auth
+from app.sign.router import sign
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -26,3 +27,4 @@ def root():
 
 
 app.include_router(auth)
+app.include_router(sign)

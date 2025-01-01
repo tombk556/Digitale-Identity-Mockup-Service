@@ -113,7 +113,6 @@ async def get_user(current_user: schemas.User = Depends(oauth2.get_current_user)
 def download_private_key(current_user: schemas.User = Depends(oauth2.get_current_user)):
     private_key_path = os.path.join(PRIVATE_KEY_DIRECTORY, f"{current_user.username}_private_key.pem")
     
-    print(private_key_path)
     if not os.path.exists(private_key_path):
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
