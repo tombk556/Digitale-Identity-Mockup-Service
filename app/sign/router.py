@@ -108,7 +108,5 @@ def verify_signature(verify_req: schemas.VerifyRequest, db: Session = Depends(Po
     except Exception:
         return schemas.VerifyResponse(
             is_valid=False,
-            detail="Signature is invalid."
-        )
-
+            detail="Signature is invalid.")
 
