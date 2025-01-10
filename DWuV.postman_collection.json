@@ -1,0 +1,299 @@
+{
+	"info": {
+		"_postman_id": "2f0be444-f951-4a6e-97d1-f7144887624d",
+		"name": "DWuV",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "33094060"
+	},
+	"item": [
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "Register",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{   \n    \"email\": \"user@mail.de\",\n    \"username\": \"user\",\n    \"password\": \"Password123.\",\n    \"name\":\"User\",\n    \"age\": 29\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{DEV_URL}}/auth/sign_up",
+							"host": [
+								"{{DEV_URL}}"
+							],
+							"path": [
+								"auth",
+								"sign_up"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.environment.set(\"JWT\", pm.response.json().access_token);"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "username",
+									"value": "user@mail.de",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "Password123.",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{DEV_URL}}/auth/login",
+							"host": [
+								"{{DEV_URL}}"
+							],
+							"path": [
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delte User",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{JWT}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"message\":\"1234Hallo ich bins der Tom\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{DEV_URL}}/auth/delete_user",
+							"host": [
+								"{{DEV_URL}}"
+							],
+							"path": [
+								"auth",
+								"delete_user"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update User",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{JWT}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"user@web.de\",\n    \"username\": \"usercool\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{DEV_URL}}/auth/update_user",
+							"host": [
+								"{{DEV_URL}}"
+							],
+							"path": [
+								"auth",
+								"update_user"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Downlaod PK",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{JWT}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{DEV_URL}}/auth/download_private_key",
+							"host": [
+								"{{DEV_URL}}"
+							],
+							"path": [
+								"auth",
+								"download_private_key"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Sign",
+			"item": [
+				{
+					"name": "Sign Message",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.environment.set(\"SIGNATURE\", pm.response.json().signature);",
+									"pm.environment.set(\"MESSAGE\", pm.response.json().message);"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{JWT}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "private_key_file",
+									"type": "file",
+									"src": "/Users/tom/Documents/AWI Msc./3. Semester/Digitale Wirtschaft & Verwaltung/Fallbeispiel 3/Mockup/tmp/leabk_private_key.pem"
+								},
+								{
+									"key": "message",
+									"value": "Hello from leabk and a happy new year",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{DEV_URL}}/sign/sign_message",
+							"host": [
+								"{{DEV_URL}}"
+							],
+							"path": [
+								"sign",
+								"sign_message"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Verify Message",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"message\": \"{{MESSAGE}}\",\n    \"signature\":\"{{SIGNATURE}}\",\n    \"username\": \"leabk\"\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{DEV_URL}}/sign/verify_signature",
+							"host": [
+								"{{DEV_URL}}"
+							],
+							"path": [
+								"sign",
+								"verify_signature"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}

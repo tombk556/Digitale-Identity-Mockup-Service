@@ -52,16 +52,16 @@ uvicorn app.main:app
 Open the following URL: **http://127.0.0.1:8000**
 
 
-### Run docker-compose up:
+## Production with Docker
 - create a **.env** file
 - put the following credentials into the .env file
 
 ```bash
-DATABASE_URL_PSQL=...
-SECRET_KEY=...
+DATABASE_URL_PSQL=postgres://tom:PAssword123.@db/DWUV
+SECRET_KEY=828jfnsnsn302002ndndnn202002nndn2nsa
 ALGORITHM=HS256
 ACCESS_TOKEN_EXPIRE_MINUTES=60
-PRIVATE_KEY_DIRECTORY=/My/App/...
+PRIVATE_KEY_DIRECTORY=/app/private_keys
 ```
 ### Run docker-compose up
 
