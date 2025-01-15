@@ -16,7 +16,7 @@ import os
 
 sign = APIRouter(
     prefix="/sign",
-    tags=["Authentication"]
+    tags=["Sign"]
 )
 
 @sign.post("/sign_message", response_model=schemas.SignResponse)
